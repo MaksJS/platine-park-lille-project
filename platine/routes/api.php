@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:api');
-
 Route::get('/spaces', function (Request $request) {
     return response()->json(json_decode(file_get_contents('data.json'), true), 200);
 })->middleware('api');
