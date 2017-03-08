@@ -14,21 +14,32 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/spaces', function (Request $request) {
-    return response()->json(json_decode(file_get_contents('data.json'), true), 200);
-})->middleware('api');
-
-Route::get('/spaces/{building}', function (Request $request, $building) {
-    $data = json_decode(file_get_contents('data.json'), true);
-    if (array_key_exists($building, $data))
-        return response()->json($data[$building], 200);
-    else abort(404);
-})->middleware('api');
-
-Route::get('/space/{building}/{space}', function (Request $request, $building, $space) {
-    $data = json_decode(file_get_contents('data.json'), true);    
-    if (array_key_exists($building, $data) && array_key_exists($space, $data[$building]))  
-        return response()->json($data[$building][$space], 200);
-    else abort(404);
+    \Carbon\Carbon::setLocale('fr');
+    $places = json_decode(file_get_contents('data.json'), true);
+    $buildings = ["m5", "m3"];
+    foreach ($buildings as $building) {
+        for ($i = 0; $i < count($places[$building]); $i++) {
+            unset($places[$building][$i]['handicap']);
+            unset($places[$building][$i]['center']);
+            unset($places[$building][$i]['top_left_corner']);
+            unset($places[$building][$i]['top_right_corner']);
+            unset($places[$building][$i]['bottom_left_corner']);
+            unset($places[$building][$i]['bottom_right_corner']);
+            $data = \DB::table('spaces')
+                ->where('building', '=', $building)
+                ->where('space', '=', $places[$building][$i]['id'])
+                ->orderBy('created_at', 'DESC')
+                ->first();
+            if ($data == null) {
+                $places[$building][$i]['state'] = "UNKNOWN";
+            }
+            else {
+                $places[$building][$i]['state'] = boolval($data->free) ? "FREE" : "TAKEN";
+                $places[$building][$i]['message'] = (new \Carbon\Carbon($data->created_at))->diffForHumans(\Carbon\Carbon::now());
+            }
+        }
+    }
+    return response()->json($places, 200);
 })->middleware('api');
 
 Route::post('/space/{building}/{space}/occuped', function (Request $request, $building, $space) {
@@ -53,19 +64,4 @@ Route::post('/space/{building}/{space}/free', function (Request $request, $build
         ]
     );
     return response()->json(true, 200);
-})->middleware('api');
-
-Route::get('/space/{building}/{space}/last_state', function (Request $request, $building, $space) {
-    $data = \DB::table('spaces')
-        ->where('building', '=', $building)
-        ->where('space', '=', $space)
-        ->orderBy('created_at', 'DESC')
-        ->first();
-    \Carbon\Carbon::setLocale('fr');
-    if ($data != null)
-        return response()->json([
-            'free' => boolval($data->free), 
-            'timestamp' => (new \Carbon\Carbon($data->created_at))->diffForHumans(\Carbon\Carbon::now())
-        ], 200);
-    else abort(404);
 })->middleware('api');
