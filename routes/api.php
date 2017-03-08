@@ -32,6 +32,7 @@ Route::get('/spaces', function (Request $request) {
                 ->first();
             if ($data == null) {
                 $places[$building][$i]['state'] = "UNKNOWN";
+                $places[$building][$i]['message'] = "";
             }
             else {
                 $places[$building][$i]['state'] = boolval($data->free) ? "FREE" : "TAKEN";
