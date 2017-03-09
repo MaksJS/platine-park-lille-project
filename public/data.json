@@ -1131,6 +1131,30 @@
         "latitude": 50.609747,
         "longitude": 3.137960
       }
+    },
+    {
+      "id": 99,
+      "handicap": false,
+      "center": {
+        "latitude": 51.007208,
+        "longitude": 2.296385
+      },
+      "top_left_corner": {
+        "latitude": 51.007184,
+        "longitude": 2.296389
+      },
+      "top_right_corner": {
+        "latitude": 51.007195,
+        "longitude": 2.296352
+      },
+      "bottom_left_corner": {
+        "latitude": 51.007225,
+        "longitude": 2.296416
+      },
+      "bottom_right_corner": {
+        "latitude": 51.007233,
+        "longitude": 2.296383
+      }
     }
   ]
 }
