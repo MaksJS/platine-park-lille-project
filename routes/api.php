@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/spaces', function (Request $request) {
+    \DB::delete("delete from spaces where datediff(now(), created_at) > 1");
     \Carbon\Carbon::setLocale('fr');
     $places = json_decode(file_get_contents('data.json'), true);
     $buildings = ["m5", "m3"];
